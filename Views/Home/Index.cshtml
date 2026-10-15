@@ -1,0 +1,529 @@
+﻿@model Excel.ViewModels.ExcelUploadViewModel
+
+@{
+    ViewData["Title"] = "Excel Upload";
+    ViewData["LayoutClass"] = "excel-upload-layout";
+}
+
+<style>
+    .excel-upload-page {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 24px 32px 40px;
+        box-sizing: border-box;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        color: #243447;
+    }
+    #excelUploadForm {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+    }
+    .excel-upload-title {
+        margin: 0 0 1.75rem;
+        color: #19324d;
+        font-size: clamp(1.75rem, 3vw, 2.35rem);
+        font-weight: 700;
+        text-align: center;
+    }
+    .upload-message {
+        max-width: 760px;
+        margin: 0 auto 1.25rem;
+        padding: .85rem 1rem;
+        border: 1px solid;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+    .upload-message.success {
+        border-color: #a6d5ba;
+        background: #f0faf4;
+        color: #21623a;
+    }
+    .upload-message.error {
+        border-color: #e5b8b8;
+        background: #fff6f6;
+        color: #8a3030;
+    }
+    .upload-error-popup {
+        position: fixed;
+        top: 1rem;
+        left: 50%;
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        gap: 1rem;
+        width: min(680px, calc(100% - 2rem));
+        padding: 1rem 1.15rem;
+        transform: translateX(-50%);
+        border: 2px solid #c0392b;
+        border-radius: 10px;
+        background: #fff0f0;
+        box-shadow: 0 8px 24px rgba(100, 20, 20, .25);
+        color: #7f1d1d;
+    }
+    .upload-error-popup-icon {
+        display: grid;
+        flex: 0 0 2rem;
+        width: 2rem;
+        height: 2rem;
+        place-items: center;
+        border-radius: 50%;
+        background: #c0392b;
+        color: #fff;
+        font-size: 1.35rem;
+        font-weight: 700;
+    }
+    .upload-error-popup-content {
+        flex: 1;
+        min-width: 0;
+    }
+    .upload-error-popup-content h2 {
+        margin: 0 0 .25rem;
+        color: #8f2118;
+        font-size: 1.05rem;
+    }
+    .upload-error-popup-content p {
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+    .upload-error-popup-button {
+        flex: 0 0 auto;
+        margin: 0;
+        padding: .5rem 1rem;
+        background: #b52d22;
+    }
+    .upload-error-popup-button:hover {
+        background: #8f2118;
+    }
+    .upload-notifications {
+        position: fixed;
+        top: 100px;
+        left: 50%;
+        z-index: 1999;
+        width: min(550px, calc(100vw - 32px));
+        box-sizing: border-box;
+        min-height: 0;
+        margin: 0;
+        transform: translateX(-50%);
+        pointer-events: none;
+    }
+    .upload-notification {
+        position: static;
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+        pointer-events: auto;
+        display: none;
+        opacity: 1;
+        transition: opacity .5s ease;
+    }
+    .upload-notification.fade-out {
+        opacity: 0;
+    }
+    .upload-card {
+        border: 1px solid #d7e1ea;
+        border-radius: 16px;
+        box-shadow: 0 8px 22px rgba(37, 60, 87, .08);
+    }
+    .common-card {
+        margin-bottom: 24px;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f8fbfd, #eef5fa);
+    }
+    .file-card {
+        height: 100%;
+        min-width: 0;
+        padding: 2rem;
+        box-sizing: border-box;
+    }
+    .file-card.file-one {
+        background: linear-gradient(135deg, #fffaf3, #fff1df);
+        border: 1px solid #f1d7b5;
+    }
+    .file-card.file-two {
+        background: linear-gradient(135deg, #f5fcf7, #eaf8ef);
+    }
+    .card-heading {
+        margin: 0 0 1.25rem;
+        color: #24445f;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+    .common-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 2rem;
+    }
+    .file-cards-container {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 2rem;
+        width: 100%;
+        margin-bottom: 32px;
+    }
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: .45rem;
+    }
+    .field-group label {
+        color: #38526a;
+        font-size: .92rem;
+        font-weight: 600;
+    }
+    .field-group input[type="number"],
+    .field-group input[type="file"] {
+        box-sizing: border-box;
+        width: 100%;
+        min-height: 2.65rem;
+        border: 1px solid #b9cbd9;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, .85);
+        color: #263b4d;
+        padding: .55rem .7rem;
+        font: inherit;
+    }
+    .field-group input:focus {
+        border-color: #5e9bc2;
+        outline: 3px solid rgba(94, 155, 194, .2);
+    }
+    .file-fields {
+        display: grid;
+        gap: 1.1rem;
+    }
+    .process-button {
+        width: 100%;
+        margin-top: 1.25rem;
+        border: 0;
+        border-radius: 8px;
+        padding: .72rem 1rem;
+        background: #356f96;
+        color: #fff;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+        transition: background-color .2s ease, transform .2s ease;
+    }
+    .file-two .process-button {
+        background: #39805c;
+    }
+    .process-button:hover {
+        background: #285a7c;
+        transform: translateY(-1px);
+    }
+    .file-two .process-button:hover {
+        background: #2b6849;
+    }
+    .uploaded-contents-container {
+        width: 100%;
+        max-width: 100%;
+        margin-top: 32px;
+        box-sizing: border-box;
+    }
+    .documents-container {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    .documents-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 20px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .document-panel {
+        min-width: 0;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+    .loan-documents-panel {
+        background: #fff8ef;
+        border: 1px solid #f0d7b5;
+        border-radius: 10px;
+        padding: 14px;
+        box-sizing: border-box;
+    }
+    .title-documents-panel {
+        background: #f3faf5;
+        border: 1px solid #cfe6d5;
+        border-radius: 10px;
+        padding: 14px;
+        box-sizing: border-box;
+    }
+    .document-panel h3 {
+        margin: 0 0 16px;
+        color: #24445f;
+        font-size: 1.15rem;
+    }
+    .document-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 16px;
+    }
+    .document-panel-header h3 {
+        margin: 0;
+    }
+    .upload-loan-button {
+        width: auto;
+        margin-top: 0;
+        white-space: nowrap;
+    }
+    .loan-upload-status {
+        margin: 0 0 1rem;
+    }
+    .upload-title-button {
+        width: auto;
+        margin-top: 0;
+        white-space: nowrap;
+    }
+    .title-upload-status {
+        margin: 0 0 1rem;
+    }
+    .document-table-container {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    .document-table-wrapper {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        box-sizing: border-box;
+        border: 1px solid #d7e1ea;
+        border-radius: 8px;
+    }
+    .document-table {
+        width: 100%;
+        min-width: 1200px;
+        max-width: none;
+        border-collapse: collapse;
+        table-layout: fixed;
+        background: rgba(255, 255, 255, .8);
+    }
+    .document-table tr {
+        height: auto;
+    }
+    .document-table th {
+        padding: 10px;
+        border: 1px solid #d7e1ea;
+        color: #24445f;
+        font-weight: 700;
+        text-align: left;
+        vertical-align: middle;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .document-table td {
+        padding: 9px 10px;
+        border: 1px solid #d7e1ea;
+        color: #263b4d;
+        vertical-align: middle;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+    .document-table th:nth-child(1),
+    .document-table td:nth-child(1) {
+        width: 70px;
+    }
+    .document-table th:nth-child(2),
+    .document-table td:nth-child(2) {
+        width: 120px;
+    }
+    .document-table th:nth-child(3),
+    .document-table td:nth-child(3) {
+        width: 80px;
+    }
+    .document-table th:nth-child(4),
+    .document-table td:nth-child(4) {
+        width: 110px;
+    }
+    .document-table th:nth-child(5),
+    .document-table td:nth-child(5) {
+        width: 90px;
+    }
+    .document-table th:nth-child(6),
+    .document-table td:nth-child(6) {
+        width: 200px;
+    }
+    .document-table th:nth-child(7),
+    .document-table td:nth-child(7) {
+        width: 130px;
+    }
+    .document-table th:nth-child(8),
+    .document-table td:nth-child(8) {
+        width: 100px;
+    }
+    .document-table th:nth-child(9),
+    .document-table td:nth-child(9) {
+        width: 100px;
+    }
+    .document-table th:nth-child(10),
+    .document-table td:nth-child(10) {
+        width: 200px;
+    }
+    .document-table th:nth-child(11),
+    .document-table td:nth-child(11) {
+        width: 100px;
+    }
+    .document-table th:nth-child(3),
+    .document-table td:nth-child(3),
+    .document-table th:nth-child(4),
+    .document-table td:nth-child(4),
+    .document-table th:nth-child(5),
+    .document-table td:nth-child(5),
+    .document-table th:nth-child(9),
+    .document-table td:nth-child(9),
+    .document-table th:nth-child(11),
+    .document-table td:nth-child(11) {
+        text-align: center;
+    }
+    .document-table td:nth-child(6),
+    .document-table td:nth-child(10) {
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+    .loan-documents-table thead th {
+        background: #fff0dc;
+    }
+    .loan-documents-table tbody tr {
+        background: #fff8ef;
+    }
+    .loan-documents-table tbody tr:hover {
+        background: #ffefd9;
+    }
+    .title-documents-table thead th {
+        background: #e8f5eb;
+    }
+    .title-documents-table tbody tr {
+        background: #f3faf5;
+    }
+    .title-documents-table tbody tr:hover {
+        background: #e8f5eb;
+    }
+    .upload-metadata {
+        margin: 0 0 1rem;
+        color: #38526a;
+        font-size: .92rem;
+        font-weight: 600;
+    }
+    .upload-metadata p {
+        margin: .25rem 0;
+    }
+    @@media (max-width: 768px) {
+        .common-fields {
+            grid-template-columns: 1fr;
+        }
+        .file-cards-container {
+            grid-template-columns: 1fr;
+        }
+        .excel-upload-page {
+            padding: 1.5rem 1rem 3rem;
+        }
+    }
+    @@media (max-width: 1100px) {
+        .documents-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    @@media (max-width: 760px) {
+        .document-table-wrapper {
+            overflow-x: auto;
+        }
+        .document-table {
+            min-width: 1200px;
+        }
+        .upload-error-popup {
+            align-items: flex-start;
+            gap: .75rem;
+            padding: .9rem;
+        }
+        .upload-error-popup-button {
+            padding: .45rem .75rem;
+        }
+    }
+</style>
+<main class="excel-upload-page">
+    <div id="uploadErrorPopup" class="upload-error-popup" role="alertdialog" aria-modal="false" aria-labelledby="uploadErrorPopupTitle" aria-describedby="uploadErrorMessage" aria-hidden="true">
+        <div class="upload-error-popup-icon" aria-hidden="true">!</div>
+        <div class="upload-error-popup-content">
+            <h2 id="uploadErrorPopupTitle">Upload Failed</h2>
+            <p id="uploadErrorMessage"></p>
+        </div>
+        <button type="button" class="upload-error-popup-button" onclick="hideUploadError()">OK</button>
+    </div>
+    <h1 class="excel-upload-title">Excel Upload</h1>
+    <div id="uploadNotifications" class="upload-notifications" aria-live="polite">
+        @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+        {
+            <p class="upload-message success upload-notification static-upload-notification" role="status">@Model.SuccessMessage</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+        {
+            <p id="serverUploadError" class="upload-message error" role="alert" hidden>@Model.ErrorMessage</p>
+        }
+        <p id="loanUploadNotification" class="upload-message upload-notification" role="status"></p>
+        <p id="titleUploadNotification" class="upload-message upload-notification" role="status"></p>
+    </div>
+    <form id="excelUploadForm"
+          asp-controller="Home"
+          asp-action="UploadAndProcessExcelFile"
+          method="post"
+           enctype="multipart/form-data"
+           asp-antiforgery="false">
+        <section class="upload-card common-card" aria-labelledby="common-information-heading">
+            <h2 id="common-information-heading" class="card-heading">Common Information</h2>
+            <div class="common-fields">
+                <div class="field-group">
+                    <label asp-for="ClientId">Client ID</label>
+                    <input asp-for="ClientId" id="ClientId" type="number" min="0" />
+                </div>
+                <div class="field-group">
+                    <label asp-for="CollRequestId">Coll Request ID</label>
+                    <input asp-for="CollRequestId" id="CollRequestId" type="number" min="0" />
+                </div>
+                <div class="field-group">
+                    <label asp-for="UserID">User ID</label>
+                    <input asp-for="UserID" id="UserID" type="number" min="0" />
+                </div>
+            </div>
+        </section>
+    </form>
+    <div class="uploaded-contents-container documents-container">
+        <h2 class="card-heading">Documents</h2>
+        <div class="documents-grid">
+            <section class="document-panel loan-documents-panel" aria-labelledby="loan-documents-heading">
+                <div class="document-panel-header">
+                    <h3 id="loan-documents-heading">Loan Documents</h3>
+                    <button type="button" id="uploadLoanDocumentButton" class="process-button upload-loan-button" onclick="document.getElementById('loanExcelFileInput').click()">Upload Loan Document</button>
+                </div>
+                <input id="loanExcelFileInput" name="excelFile" type="file" accept=".xlsx" hidden onchange="uploadLoanDocument(this)" />
+                <div id="loanDocumentsTableContainer" class="document-table-container" aria-live="polite"></div>
+            </section>
+            <section class="document-panel title-documents-panel" aria-labelledby="title-documents-heading">
+                <div class="document-panel-header">
+                    <h3 id="title-documents-heading">Title Documents</h3>
+                    <button type="button" id="uploadTitleDocumentButton" class="process-button upload-title-button" onclick="document.getElementById('titleExcelFileInput').click()">Upload Title Document</button>
+                </div>
+                <input id="titleExcelFileInput" name="excelFile" type="file" accept=".xlsx" hidden onchange="uploadTitleDocument(this)" />
+                <div id="titleDocumentsTableContainer" class="document-table-container" aria-live="polite"></div>
+            </section>
+        </div>
+    </div>
+</main>

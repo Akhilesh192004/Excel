@@ -1,0 +1,136 @@
+:root {
+    color-scheme: light;
+    --green-900: #245c45;
+    --green-700: #3f8061;
+    --green-600: #568f6f;
+    --green-100: #e8f2ec;
+    --green-050: #f4faf6;
+    --ink: #26352d;
+    --muted: #64736b;
+    --surface: #ffffff;
+    --border: #d5e4da;
+    --shadow: 0 10px 30px rgba(42, 86, 62, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--green-050), #f8fbf9);
+    color: var(--ink);
+    font-family: "Segoe UI", Arial, sans-serif;
+    line-height: 1.5;
+}
+
+main {
+    width: min(100% - 2rem, 760px);
+    margin: 3rem auto;
+    padding: 2.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+}
+
+.excel-upload-layout {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+h2 {
+    margin: 0 0 1.25rem;
+    color: var(--green-900);
+    font-size: 1.55rem;
+    font-weight: 650;
+}
+
+form,
+.file-lookup {
+    padding: 1.5rem;
+    background: var(--green-050);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+form > div,
+.file-lookup {
+    margin-bottom: 1rem;
+}
+
+label {
+    color: var(--green-900);
+    font-weight: 600;
+}
+
+input {
+    width: 100%;
+    margin-top: 0.4rem;
+    padding: 0.7rem 0.8rem;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid #bdd3c4;
+    border-radius: 8px;
+    font: inherit;
+}
+
+input[type="file"] {
+    padding: 0.55rem;
+}
+
+input:focus {
+    outline: 3px solid rgba(86, 143, 111, 0.2);
+    border-color: var(--green-600);
+}
+
+button {
+    margin-top: 0.75rem;
+    padding: 0.7rem 1.15rem;
+    color: #ffffff;
+    background: var(--green-700);
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background: var(--green-900);
+    transform: translateY(-1px);
+}
+
+button:focus-visible {
+    outline: 3px solid rgba(86, 143, 111, 0.3);
+    outline-offset: 2px;
+}
+
+hr {
+    margin: 2rem 0;
+    border: 0;
+    border-top: 1px solid var(--border);
+}
+
+p[role="status"] {
+    min-height: 1.5rem;
+    margin: 1rem 0 0;
+    color: var(--green-900);
+    font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    main {
+        width: min(100% - 1rem, 760px);
+        margin: 1rem auto;
+        padding: 1.25rem;
+    }
+}
